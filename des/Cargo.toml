@@ -2,7 +2,23 @@
 name = "des"
 version = "0.1.0"
 edition = "2021"
+authors = ["Ji, Yong-Hyeon <hacker3740@gmail.com>"]
+description = "A Rust implementation of the DES encryption algorithm"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# Here you can add dependencies needed for your project
+# For example, if you need a random number generator for key generation or testing:
+rand = "0.8.5"
+
+# If you have any specific dependencies required for cryptographic functions, list them here:
+# For DES specifically, you might not need external crates, but for other projects, you might.
+# For example:
+# aes = "0.7.4"
+# hex = "0.4.3" # If you need to encode/decode hexadecimal
+
+[dev-dependencies]
+# Dependencies for testing and development; not used in the final build
+# For example, for testing purposes, you might use:
+# assert_cmd = "2.0.4"
