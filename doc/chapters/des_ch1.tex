@@ -25,3 +25,171 @@
 \end{table}
 
 \section{Key Schedule}
+
+\newpage
+\section{The S-Boxes of DES}\begin{itemize}
+	\item The Data Encryption Standard (DES) is a 64-bit block cipher with 16 rounds and a 56-bit key.
+	\item There are eight S-Boxes used in DES. They are usually denoted by $S_1, \ldots, S_8$.
+	\item Let $\binaryfield^n$ denote the set of sequences of bits ($\zero$'s and $\one$'s) of length $n$. We can equivalently think of $\binaryfield^n$ as the integers $\{0, 1, \ldots, 2^n - 1\}$.
+	\item Each S-Box of DES is a function $S_i : \binaryfield^6 \rightarrow \binaryfield^4$.
+	\item So we can think of the domain of each function $S_i$ to be the set of integers $\{0, 1, \ldots, 63\}$ and the range to be $\{0, 1, \ldots, 15\}$.
+\end{itemize}
+
+\begin{itemize}
+	\item The natural way to specify any function 
+	\[S : \{0, \ldots, 63\} \rightarrow \{0, \ldots, 15\}\]
+	would just be as a list of 64 values, where the $i$-th value of the list for $0 \leq i \leq 63$ is the value of $S(i)$. Moreover, each value in the list would be an element of $\{0, \ldots, 15\}$.
+	\item Even though the S-Boxes of DES are specified using a list of 64 values, with each value being in $\{0, \ldots, 15\}$, the list has to be interpreted differently than the natural way to determine the values of the given S-Box.
+\end{itemize}
+
+\url{https://en.wikipedia.org/wiki/DES_supplementary_material}
+
+\begin{itemize}
+	\item Let $x = (b_5b_4b_3b_2b_1b_0) \in \binaryfield^6$ be a given 6-bit input.
+	\item We form a 2-bit value $r = (b_5b_0) \in \binaryfield^2$ using the most significant bit $b_5$ and the least significant bit $b_0$ of $x$.
+	\item The value of $r$ is in $\{0, 1, 2, 3\}$ and it determines the row of the table.
+	\item We also form a 4-bit value $c = (b_4b_3b_2b_1) \in \binaryfield^4$ using the inner four bits of $x$.
+	\item The value of $c$ is in $\{0, 1, \ldots, 15\}$ and it determines the column of the table.
+	\item Here we are using zero based counting. So for example $r = 0$ refers to the first row and $c = 15$ refers to the sixteenth column.
+\end{itemize}
+
+\begin{example}
+If $x = (27)_{10} = (011011)_2$, the outer two bits are $r = (01)_2 = (1)_{10}$, so we look in the second row. The inner four bits are $c = (1101)_2 = (13)_{10}$ which gives the fourteenth column.
+
+\[
+\begin{aligned}
+	x &= \zero\textcolor{blue}{\texttt{1101}}\one \rightarrow
+	\quad \begin{cases}
+		\zero\one & \rightarrow \text{second row} \\
+		\textcolor{blue}{\texttt{1101}} & \rightarrow \text{fourteenth column}
+	\end{cases}
+\end{aligned}
+\]
+Therefore the value of $S_5(x)$ is $(9)_{10} = (1001)_2 \in \binaryfield^4$.
+\end{example}
+
+\newpage
+\begin{itemize}
+	\item 
+	Let $x = (b_5b_4b_3b_2b_1b_0) \in \binaryfield^6$.
+	To access the most significant bit $b_5$, we can use: 
+\begin{lstlisting}[style=C]
+msb = x >> 5
+\end{lstlisting}
+\vspace{8pt}
+	To access the least significant bit $b_0$, we can use: 
+\begin{lstlisting}[style=C]
+lsb = x & 1
+\end{lstlisting}
+\vspace{8pt}
+	So the two-bit value $(b_5b_0) \in \binaryfield^2$ formed by the most and least significant bits is:
+\begin{lstlisting}[style=C]
+row = (msb << 1) | lsb
+\end{lstlisting}
+\vspace{8pt}
+	This gives us the row of the table we need to look at.
+	\vspace{20pt}
+	\item To access the inner four bits of $x$ we start by right-shifting one position to knock off the least significant bit $b_0$. What's left is $(b_5b_4b_3b_2b_1)$.
+	
+	To get rid of $b_5$ but keep the rest of the bits we AND this value with $(1111)_2$ which in hex is $(f)_{16}$.
+	This is coded as:
+\begin{lstlisting}[style=C]
+col = (x >> 1) & 0xf
+\end{lstlisting}
+This gives us the column of the table we need to look at.
+\end{itemize}
+
+\newpage
+\begin{itemize}
+	\item To find the value of $S(x)$ we need to find the list index associated to $x$.
+	
+	Now that we know the row and column values determined by $x$ we can get the corresponding index of the table by:
+	
+	\[ \text{index} = \text{row} \times 16 + \text{col} \]
+	
+	Note that we are multiplying by 16 because each row of the table has 16 values.
+	
+	We can code this list index function as follows:
+	
+\begin{lstlisting}[style=C]
+// # x is 6-bits
+// # the index returned is in {0,...,63}
+// def index(x):
+//	msb = x >> 5 # most significant bit (the leftmost bit)
+//	lsb = x & 1  # least significant bit (the rightmost bit)
+//	row = (msb << 1) | lsb  # outer 2-bits of x
+//	col = (x >> 1) & 0xf    # inner 4-bits of x
+//	return row * 16 + col   # calculate the list index
+	
+fn index(x: u8) -> usize {
+	// Ensure x is 6 bits
+	let x = x & 0x3F; // Apply mask to limit to 6 bits if not already
+	
+	// Extract bits similarly to the Python version, utilizing Rust's type safety and bit operations
+	let msb: u8 = x >> 5; // Most significant bit
+	let lsb: u8 = x & 1;  // Least significant bit
+	let row: u8 = (msb << 1) | lsb; // Combine msb and lsb to form the row
+	let col: u8 = (x >> 1) & 0xF;   // Extract the 4 middle bits for the column
+	
+	// Calculate the final index, converting the row and col into usize for the return type
+	(row as usize) * 16 + (col as usize)
+}
+\end{lstlisting}
+\end{itemize}
+
+\newpage
+So the S-Box \(S_5\) of DES can be implemented in the following way:
+
+\begin{lstlisting}[style=C]
+// # x is 6-bits
+// # The index returned is in [0,...,63]
+// def index(x):
+//	msb = x >> 5  # most significant bit (the leftmost bit)
+//	lsb = x & 1   # least significant bit (the rightmost bit)
+//	row = (msb << 1) | lsb  # outer 2-bits of x
+//	col = (x >> 1) & 0xf    # inner 4-bits of x
+//	return row * 16 + col   # calculate the list index
+
+// s5 = [2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9,
+//	  14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6,
+//	  4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14,
+//	  11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3]
+
+// # x is 6-bits,
+// # The return value is 4-bits
+// def S5(x):
+// 	return s5[index(x)]
+
+// # Example usage
+// print(S5(27))  # should get 9
+
+const S5_TABLE: [u8; 64] = [
+	2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9,
+	14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6,
+	4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14,
+	11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3,
+];
+
+fn index(x: u8) -> usize {
+	let x = x & 0x3F; // Ensure x is 6 bits
+	let msb = x >> 5; // Most significant bit
+	let lsb = x & 1;  // Least significant bit
+	let row = (msb << 1) | lsb; // Outer 2-bits of x
+	let col = (x >> 1) & 0xF;   // Inner 4-bits of x
+	(row as usize) * 16 + (col as usize) // Calculate the list index
+}
+
+fn s5(x: u8) -> u8 {
+	// Call index(x) to get the index, then use it to retrieve the value from S5_TABLE
+	S5_TABLE[index(x)]
+}
+
+fn main() {
+	println!("{}", s5(27)); // Should output 9
+}
+\end{lstlisting}
+
+
+
+
+
