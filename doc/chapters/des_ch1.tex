@@ -189,7 +189,79 @@ fn main() {
 }
 \end{lstlisting}
 
+\newpage
+\section{Linear Cryptanalysis for DES}
+
+\begin{note}
+Define $\F_2=\binaryfield$ to be the filed of two elements. We interpret $\F_2$ as the set of bits (zero and one). We have two binary operation on $\F_2$ namely \textbf{addition} and \textbf{multiplication}, so that $\F_2$ becomes a \textbf{field} under these operations.
+\begin{center}
+\begin{minipage}{.48\textwidth}
+\begin{itemize}
+	\item $\oplus_2:\F_2\times\F_2\to\F_2$.
+	\item The \textbf{bitwise-addition operation} on $\F_2$ is the logical operator XOR.
+	\item It is denoted by $\oplus_2$.
+\end{itemize}
+\begin{center}
+	\begin{tabular}{c|c||c}
+		\toprule[1.2pt]
+		$x$ & $y$ & $x\oplus_2 y$\\
+		\hline
+		0 & 0 & 0\\
+		\hline
+		0 & 1 & 1\\
+		\hline
+		1 & 0 & 1\\
+		\hline
+		1 & 1 & 0\\
+		\bottomrule[1.2pt]
+	\end{tabular}
+\end{center}
+\end{minipage}
+\begin{minipage}{.48\textwidth}
+\begin{itemize}
+	\item $\odot_2:\F_2\times\F_2\to\F_2$.
+	\item The \textbf{bitwise-multiplication operation} on $\F_2$ is the logical operator AND.
+	\item It is denoted by $\odot_2$.
+\end{itemize}
+\begin{center}
+	\begin{tabular}{c|c||c}
+		\toprule[1.2pt]
+		$x$ & $y$ & $x\odot_2 y$\\
+		\hline
+		0 & 0 & 0\\
+		\hline
+		0 & 1 & 0\\
+		\hline
+		1 & 0 & 0\\
+		\hline
+		1 & 1 & 1\\
+		\bottomrule[1.2pt]
+	\end{tabular}
+\end{center}
+\end{minipage}
+\end{center}
+\end{note}
+
+\begin{tcolorbox}[colframe=defcolor,title={\color{white}\bf SBOX}]
+\begin{definition}
+For given $S$-box $S_a$ ($a = 1,2,...,8$), \ie, \[
+S_1,\quad S_2,\quad\cdots,\quad S_8.
+\] Note that $S_a:\binaryfield^{6}\to\binaryfield^{4}$. We define \[
+NS_a(\alpha,\beta)\quad\text{with}\quad \alpha\in\intoo{0, 2^6}\ \text{and}\ \beta\in\intoo{0,2^4}
+\] by
+\[
+NS_a(\alpha,\beta)\triangleq \#\set{x\in\intco{0, 2^6}:\bigoplus_{i=0}^5\of{x[i]\odot_2 \alpha[i]}=\bigoplus_{j=0}^3\of{S_a(x)[j]\odot_2 \beta[j]}},
+\] where \begin{itemize}
+	\item $x=x[5]\adjacent x[4]\adjacent x[3]\adjacent x[2]\adjacent x[1]\adjacent x[0]$. ($x\in\binaryfield^{6}$ and $x[i]\in\binaryfield^2$);
+	\item $\alpha=\alpha[5]\adjacent \alpha[4]\adjacent \alpha[3]\adjacent \alpha[2]\adjacent \alpha[1]\adjacent \alpha[0]$. ($\alpha\in\binaryfield^{6}$ and $\alpha[i]\in\binaryfield^2$);
+	\item $S_a(x)=S_a(x)[3]\adjacent S_a(x)[2]\adjacent S_a(x)[1]\adjacent S_a(x)[0]$. ($S_a(x)\in\binaryfield^{4}$ and $S_a(x)[i]\in\binaryfield^2$);
+	\item $\beta=\beta[3]\adjacent \beta[2]\adjacent \beta[1]\adjacent \beta[0]$. ($\beta\in\binaryfield^{4}$ and $\beta[i]\in\binaryfield^2$).
+\end{itemize}
 
 
+Then $NS_a(\alpha,\beta)$ be the number of times out of $64$ input patterns of $S_a$, such that an XORed value of the input bits masked by $\alpha$ agrees with an XORed value of the output bits masked by $\beta$; that is to say,
+where the symbol $\cdot$ denotes a bitwise AND operation.
+\end{definition}
+\end{tcolorbox}
 
 
