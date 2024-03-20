@@ -264,4 +264,20 @@ where the symbol $\cdot$ denotes a bitwise AND operation.
 \end{definition}
 \end{tcolorbox}
 
+\newpage
+\begin{itemize}
+	\item Consider $S_5:\binaryfield^6\to\binaryfield^4:x\mapsto S(x)$.
+	\item Let $\alpha = \texttt{0x10} = (010000)_2$ and $\beta=\texttt{0xF}=(1111)_2$ since $NS_5(\alpha, \beta)=12$.
+	\item $12/64=0.1875$.
+	\item 
+	\begin{align*}
+		\alpha\cdot x&=\alpha[4],\\
+		\beta\cdot S_5(x)&=S_5(x)[3]\oplus S_5(x)[2]\oplus S_5(x)[1]\oplus S_5(x)[0]
+	\end{align*}
+	\item \begin{align*}
+		\alpha[4]&=S_5(x)[3]\oplus S_5(x)[2]\oplus S_5(x)[1]\oplus S_5(x)[0]\quad\text{with}\quad p=0.1875\\
+		\alpha[4]&=S_5(x)[3]\oplus S_5(x)[2]\oplus S_5(x)[1]\oplus S_5(x)[0]\oplus 1\quad\text{with}\quad p=0.8125
+	\end{align*}
+\end{itemize}
+
 
