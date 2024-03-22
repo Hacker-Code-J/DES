@@ -8,8 +8,8 @@ fn bias_integer(s: &[u8], alpha: u8, beta: u8, n: u8) -> i8 {
             e += 1;
         }
     }
-    // e as i8 - (range / 2) as i8
-    e as i8
+    e as i8 - (range / 2) as i8
+    // e as i8
 }
 
 pub fn generate_lat(s: &[u8], n: u8, m: u8) -> Vec<Vec<i8>> {

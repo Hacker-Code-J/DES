@@ -15,7 +15,7 @@ B = []
 C = []
 D = []
 
-for i in range(15):
+for i in range(63):
     if get_bit_value(i, 4) == get_bit_value(S[i], 3) ^ get_bit_value(S[i], 2) ^ get_bit_value(S[i], 1) ^ get_bit_value(S[i], 0):
         A.append(i)
     else:
